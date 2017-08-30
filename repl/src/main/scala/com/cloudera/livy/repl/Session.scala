@@ -55,7 +55,13 @@ class Session(
   extends Logging {
   import Session._
 
+//  private val interpreterExecutor = ExecutionContext.fromExecutorService(
+//    Executors.newSingleThreadExecutor())
+
   private val interpreterExecutor = ExecutionContext.fromExecutorService(
+    Executors.newFixedThreadPool(3))
+
+  private val createExecutor = ExecutionContext.fromExecutorService(
     Executors.newSingleThreadExecutor())
 
   private val cancelExecutor = ExecutionContext.fromExecutorService(
@@ -87,9 +93,9 @@ class Session(
       _sc = Option(sc)
       changeState(SessionState.Idle())
       sc
-    }(interpreterExecutor)
+    }(createExecutor)
 
-    future.onFailure { case _ => changeState(SessionState.Error()) }(interpreterExecutor)
+    future.onFailure { case _ => changeState(SessionState.Error()) }(createExecutor)
     future
   }
 
@@ -166,6 +172,7 @@ class Session(
 
   def close(): Unit = {
     interpreterExecutor.shutdown()
+    createExecutor.shutdown()
     cancelExecutor.shutdown()
     interpreter.close()
   }
