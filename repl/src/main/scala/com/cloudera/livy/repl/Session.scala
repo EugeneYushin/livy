@@ -59,7 +59,9 @@ class Session(
 //    Executors.newSingleThreadExecutor())
 
   private val interpreterExecutor = ExecutionContext.fromExecutorService(
-    Executors.newFixedThreadPool(3))
+//    Executors.newFixedThreadPool(3)
+    Executors.newCachedThreadPool()
+  )
 
 //  private val createExecutor = ExecutionContext.fromExecutorService(
 //    Executors.newSingleThreadExecutor())
