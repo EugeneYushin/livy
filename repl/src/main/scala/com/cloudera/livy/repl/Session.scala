@@ -61,8 +61,8 @@ class Session(
   private val interpreterExecutor = ExecutionContext.fromExecutorService(
     Executors.newFixedThreadPool(3))
 
-  private val createExecutor = ExecutionContext.fromExecutorService(
-    Executors.newSingleThreadExecutor())
+//  private val createExecutor = ExecutionContext.fromExecutorService(
+//    Executors.newSingleThreadExecutor())
 
   private val cancelExecutor = ExecutionContext.fromExecutorService(
     Executors.newSingleThreadExecutor())
@@ -93,9 +93,9 @@ class Session(
       _sc = Option(sc)
       changeState(SessionState.Idle())
       sc
-    }(createExecutor)
+    }(interpreterExecutor)
 
-    future.onFailure { case _ => changeState(SessionState.Error()) }(createExecutor)
+    future.onFailure { case _ => changeState(SessionState.Error()) }(interpreterExecutor)
     future
   }
 
@@ -172,7 +172,7 @@ class Session(
 
   def close(): Unit = {
     interpreterExecutor.shutdown()
-    createExecutor.shutdown()
+//    createExecutor.shutdown()
     cancelExecutor.shutdown()
     interpreter.close()
   }
