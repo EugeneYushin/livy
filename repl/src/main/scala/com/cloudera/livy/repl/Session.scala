@@ -58,10 +58,11 @@ class Session(
 //  private val interpreterExecutor = ExecutionContext.fromExecutorService(
 //    Executors.newSingleThreadExecutor())
 
-  private val interpreterExecutor = ExecutionContext.fromExecutorService(
+  import scala.concurrent.ExecutionContext.Implicits.global
+  //  private val interpreterExecutor = ExecutionContext.fromExecutorService(
 //    Executors.newFixedThreadPool(3)
-    Executors.newCachedThreadPool()
-  )
+//    Executors.newCachedThreadPool()
+//  )
 
 //  private val createExecutor = ExecutionContext.fromExecutorService(
 //    Executors.newSingleThreadExecutor())
@@ -95,9 +96,9 @@ class Session(
       _sc = Option(sc)
       changeState(SessionState.Idle())
       sc
-    }(interpreterExecutor)
+    }//(interpreterExecutor)
 
-    future.onFailure { case _ => changeState(SessionState.Error()) }(interpreterExecutor)
+    future.onFailure { case _ => changeState(SessionState.Error()) }//(interpreterExecutor)
     future
   }
 
@@ -125,7 +126,7 @@ class Session(
       statement.compareAndTransit(StatementState.Running, StatementState.Available)
       statement.compareAndTransit(StatementState.Cancelling, StatementState.Cancelled)
       statement.updateProgress(1.0)
-    }(interpreterExecutor)
+    }//(interpreterExecutor)
 
     statementId
   }
@@ -173,7 +174,7 @@ class Session(
   }
 
   def close(): Unit = {
-    interpreterExecutor.shutdown()
+//    interpreterExecutor.shutdown()
 //    createExecutor.shutdown()
     cancelExecutor.shutdown()
     interpreter.close()
